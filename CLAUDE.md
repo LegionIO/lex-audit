@@ -61,7 +61,7 @@ Legion::Extensions::Audit
 
 ```bash
 bundle install
-bundle exec rspec     # 29 examples, 0 failures
+bundle exec rspec     # 26 examples, 0 failures
 bundle exec rubocop   # 0 offenses
 ```
 
