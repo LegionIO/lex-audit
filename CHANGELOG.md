@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1] - 2026-03-20
+
+### Added
+- `Runners::ApprovalQueue` with submit, approve, reject, list_pending, and show_approval methods
+- Lazy Sequel model definition to avoid schema introspection at require time
+- Audit event publishing via transport messages when available
+
 ## [0.1.0] - 2026-03-16
 
 ### Added
