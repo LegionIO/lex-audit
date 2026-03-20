@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'legion/extensions/audit/version'
+require 'legion/extensions/audit/runners/approval_queue'
 
 module Legion
   module Extensions
