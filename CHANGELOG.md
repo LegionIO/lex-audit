@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2] - 2026-03-21
+
+### Added
+- context_snapshot field for working memory state capture in audit entries
+- context_snapshot included in SHA-256 hash chain for tamper evidence
+- Backward-compatible verify with mixed snapshot/non-snapshot records
+
 ## [0.1.1] - 2026-03-20
 
 ### Added

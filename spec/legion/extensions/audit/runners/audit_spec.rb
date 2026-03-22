@@ -19,6 +19,7 @@ DB.create_table(:audit_log) do
   String   :status,         null: false, size: 20
   Integer  :duration_ms,    null: true
   column   :detail,         :text, null: true
+  column   :context_snapshot, :text, null: true
   String   :record_hash,    null: false, size: 64
   String   :prev_hash,      null: false, size: 64
   DateTime :created_at,     null: false
@@ -152,6 +153,55 @@ RSpec.describe Legion::Extensions::Audit::Runners::Audit do
       )
       expect(Legion::Data::Model::AuditLog.first.source).to eq('unknown')
     end
+
+    it 'stores context_snapshot when provided' do
+      result = runner.write(
+        event_type:       'action_executed',
+        principal_id:     'agent-1',
+        action:           'approve_claim',
+        resource:         'claim:12345',
+        context_snapshot: {
+          working_memory: [{ trace_id: 't1', content: 'policy lookup', activation: 0.9 }],
+          trust_scores:   { 'agent-2' => 0.85 }
+        }
+      )
+      expect(result[:success]).to be true
+      record = Legion::Data::Model::AuditLog.last
+      expect(record.context_snapshot).to be_a(String)
+      parsed = JSON.parse(record.context_snapshot, symbolize_names: true)
+      expect(parsed[:working_memory]).to be_an(Array)
+    end
+
+    it 'writes successfully without context_snapshot (backward compatible)' do
+      result = runner.write(
+        event_type:   'simple_event',
+        principal_id: 'system',
+        action:       'heartbeat',
+        resource:     'node:1'
+      )
+      expect(result[:success]).to be true
+      record = Legion::Data::Model::AuditLog.last
+      expect(record.context_snapshot).to be_nil
+    end
+
+    it 'includes context_snapshot in hash chain' do
+      frozen_time = Time.utc(2026, 3, 21, 12, 0, 0)
+      allow(Time).to receive(:now).and_return(frozen_time)
+
+      r1 = runner.write(
+        event_type: 'test', principal_id: 'w1',
+        action: 'execute', resource: 'R/f'
+      )
+      DB[:audit_log].delete
+
+      r2 = runner.write(
+        event_type: 'test', principal_id: 'w1',
+        action: 'execute', resource: 'R/f',
+        context_snapshot: { data: 'something' }
+      )
+      # Hash should differ when snapshot is present
+      expect(r1[:record_hash]).not_to eq(r2[:record_hash])
+    end
   end
 
   describe '#verify' do
@@ -183,6 +233,21 @@ RSpec.describe Legion::Extensions::Audit::Runners::Audit do
       result = runner.verify(limit: 3)
       expect(result[:records_checked]).to eq(3)
       expect(result[:valid]).to be true
+    end
+
+    it 'verifies chain with context_snapshot records' do
+      runner.write(
+        event_type: 'runner_execution', principal_id: 'w1',
+        action: 'execute', resource: 'R/f',
+        context_snapshot: { traces: ['t1'] }
+      )
+      runner.write(
+        event_type: 'runner_execution', principal_id: 'w2',
+        action: 'execute', resource: 'R/g'
+      )
+      result = runner.verify
+      expect(result[:valid]).to be true
+      expect(result[:records_checked]).to eq(2)
     end
   end
 end
