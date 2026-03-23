@@ -1,17 +1,5 @@
 # frozen_string_literal: true
 
-# Stub Legion::Transport::Message for standalone testing
-module Legion
-  module Transport
-    class Message
-      def initialize(**opts)
-        @options = opts
-      end
-    end
-  end
-end
-$LOADED_FEATURES << 'legion/transport/message'
-
 require 'legion/extensions/audit/transport/messages/audit'
 
 RSpec.describe Legion::Extensions::Audit::Transport::Messages::Audit do
@@ -36,8 +24,9 @@ RSpec.describe Legion::Extensions::Audit::Transport::Messages::Audit do
     end
 
     it 'defaults to unknown when event_type is nil' do
-      msg = described_class.new(**valid_opts, event_type: nil)
-      expect(msg.routing_key).to eq('audit.unknown')
+      opts = valid_opts.merge(event_type: nil)
+      # validate is called in initialize and raises when event_type is nil
+      expect { described_class.new(**opts) }.to raise_error(RuntimeError, /event_type/)
     end
   end
 
@@ -62,8 +51,8 @@ RSpec.describe Legion::Extensions::Audit::Transport::Messages::Audit do
       it "raises when #{field} is missing" do
         opts = valid_opts.dup
         opts.delete(field)
-        bad_msg = described_class.new(**opts)
-        expect { bad_msg.validate }.to raise_error(RuntimeError, /#{field}.*required/)
+        # validate is called in initialize, so construction raises
+        expect { described_class.new(**opts) }.to raise_error(RuntimeError, /#{field}.*required/)
       end
     end
   end

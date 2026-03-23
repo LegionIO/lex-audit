@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'sequel'
-require 'json'
 
 # In-memory SQLite database for testing
 Sequel.default_timezone = :utc
@@ -26,19 +25,8 @@ module Legion
       end
     end
   end
-
-  module JSON
-    def self.dump(obj)
-      ::JSON.generate(obj)
-    end
-
-    def self.load(str)
-      ::JSON.parse(str, symbolize_names: true)
-    end
-  end
 end
 $LOADED_FEATURES << 'legion/data'
-$LOADED_FEATURES << 'legion/json'
 
 require 'legion/extensions/audit/runners/approval_queue'
 

@@ -16,13 +16,13 @@ module Legion
             prev_hash = prev ? prev.record_hash : GENESIS_HASH
 
             created_at = opts[:created_at] ? Time.parse(opts[:created_at].to_s) : Time.now.utc
-            snapshot_json = opts[:context_snapshot] ? Legion::JSON.dump(opts[:context_snapshot]) : nil
+            snapshot_json = opts[:context_snapshot] ? json_dump(opts[:context_snapshot]) : nil
 
             content = "#{prev_hash}|#{event_type}|#{principal_id}|#{action}|#{resource}|#{created_at.utc.iso8601}"
             content = "#{content}|#{snapshot_json}" if snapshot_json
             record_hash = Digest::SHA256.hexdigest(content)
 
-            detail_json = opts[:detail] ? Legion::JSON.dump(opts[:detail]) : nil
+            detail_json = opts[:detail] ? json_dump(opts[:detail]) : nil
 
             record = Legion::Data::Model::AuditLog.create(
               event_type:       event_type,

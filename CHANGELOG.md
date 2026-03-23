@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.1.3] - 2026-03-22
+
+### Changed
+- Add legion-cache, legion-crypt, legion-data, legion-json, legion-logging, legion-settings, legion-transport as runtime dependencies
+- Replace direct Legion::JSON.dump calls with json_dump helper in runners/audit.rb and runners/approval_queue.rb
+- Replace Legion::Logging.warn guarded call with log.warn helper in runners/approval_queue.rb
+- Add Helpers::Lex include to runners/approval_queue.rb
+- Update spec_helper with real sub-gem helper stubs (legion/transport full load)
+- Update spec files to remove hand-rolled Legion::JSON stubs (real gem loaded via spec_helper)
+- Update messages/audit_spec.rb validate tests to match real Transport::Message initialize behavior
+
 ## [0.1.2] - 2026-03-21
 
 ### Added

@@ -5,16 +5,12 @@ module Legion
     module Audit
       module Runners
         module ApprovalQueue
+          include Legion::Extensions::Helpers::Lex if defined?(Legion::Extensions::Helpers::Lex)
           extend self
 
           def submit(approval_type:, payload:, requester_id:, tenant_id: nil, **)
             define_approval_queue_model
-            json_payload = if defined?(Legion::JSON)
-                             Legion::JSON.dump({ data: payload })
-                           else
-                             require 'json'
-                             ::JSON.dump({ data: payload })
-                           end
+            json_payload = json_dump({ data: payload })
 
             record = Legion::Extensions::Audit::Runners::ApprovalQueue::ApprovalQueue.create(
               approval_type: approval_type,
@@ -93,7 +89,7 @@ module Legion
               detail:       { approval_type: record.approval_type, approval_id: record.id }
             ).publish
           rescue StandardError => e
-            Legion::Logging.warn "[audit] failed to publish #{event_type}: #{e.message}" if defined?(Legion::Logging)
+            log.warn "[audit] failed to publish #{event_type}: #{e.message}"
           end
         end
       end

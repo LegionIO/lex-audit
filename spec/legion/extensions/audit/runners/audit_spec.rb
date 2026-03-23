@@ -32,19 +32,8 @@ module Legion
       class AuditLog < Sequel::Model(DB[:audit_log]); end
     end
   end
-
-  module JSON
-    def self.dump(obj)
-      ::JSON.generate(obj)
-    end
-
-    def self.load(str)
-      ::JSON.parse(str, symbolize_names: true)
-    end
-  end
 end
 $LOADED_FEATURES << 'legion/data/models/audit_log'
-$LOADED_FEATURES << 'legion/json'
 
 require 'legion/extensions/audit/runners/audit'
 
