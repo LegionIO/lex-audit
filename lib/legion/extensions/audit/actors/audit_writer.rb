@@ -7,6 +7,8 @@ module Legion
     module Audit
       module Actor
         class AuditWriter < Legion::Extensions::Actors::Subscription
+          def runner_class = Legion::Extensions::Audit::Runners::Audit
+
           def runner_function
             'write'
           end

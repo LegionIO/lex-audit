@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- Add explicit runner_class to AuditWriter actor to prevent runner resolution error at boot
+
 ## [0.1.3] - 2026-03-22
 
 ### Changed

@@ -10,7 +10,7 @@ Legion Extension that provides immutable, tamper-evident audit logging with a SH
 
 **GitHub**: https://github.com/LegionIO/lex-audit
 **License**: MIT
-**Version**: 0.1.0
+**Version**: 0.1.2
 
 ## Architecture
 
