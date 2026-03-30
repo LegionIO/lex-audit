@@ -29,7 +29,7 @@ end
 module Legion
   module Data
     module Model
-      class AuditLog < Sequel::Model(DB[:audit_log]); end
+      class AuditLog < Sequel::Model(DB[:audit_log]); end # rubocop:disable Legion/Framework/EagerSequelModel
     end
   end
 end
