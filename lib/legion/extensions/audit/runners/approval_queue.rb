@@ -67,7 +67,7 @@ module Legion
           def define_approval_queue_model
             return if Legion::Extensions::Audit::Runners::ApprovalQueue.const_defined?(:ApprovalQueue, false)
 
-            db = Legion::Data::Connection.sequel
+            db = data_connection
             return unless db&.table_exists?(:approval_queue)
 
             Legion::Extensions::Audit::Runners::ApprovalQueue.const_set(

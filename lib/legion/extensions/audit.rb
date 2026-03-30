@@ -6,9 +6,9 @@ require 'legion/extensions/audit/runners/approval_queue'
 module Legion
   module Extensions
     module Audit
-      extend Legion::Extensions::Core if Legion::Extensions.const_defined? :Core
+      extend Legion::Extensions::Core if Legion::Extensions.const_defined? :Core, false
 
-      def self.data_required?
+      def self.data_required? # rubocop:disable Legion/Extension/DataRequiredWithoutMigrations
         true
       end
 

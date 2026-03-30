@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-03-30
+
+### Changed
+- update to rubocop-legion 0.1.7, resolve all offenses
+
 ### Fixed
 - Add explicit runner_class to AuditWriter actor to prevent runner resolution error at boot
 
