@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-03-31
+
+### Added
+- `Helpers::VerifiedWrite` module with `verified_write` and `verified_edit` methods
+- Post-write SHA-256 verification catches silent write failures (disk full, permission, NFS stale)
+- Stale edit detection catches external file modifications between read and write
+- `WriteVerificationError` and `StaleEditError` error classes in `errors.rb`
+- Audit trail recording via `Legion::Data::Model::AuditLog` when legion-data is available (best-effort, never breaks the write)
+- Shared `spec/support/audit_log_db.rb` eliminates DB constant conflicts when all specs run together
+
 ## [0.1.5] - 2026-03-30
 
 ### Changed
