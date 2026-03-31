@@ -8,6 +8,7 @@ require 'legion/crypt/helper'
 require 'legion/data/helper'
 require 'legion/json/helper'
 require 'legion/transport'
+require_relative 'support/audit_log_db'
 
 module Legion
   module Extensions
