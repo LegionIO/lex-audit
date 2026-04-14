@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [0.1.7] - 2026-04-13
+
+### Added
+- `ApprovalQueue#submit` accepts `resume_routing_key:` and `resume_exchange:` kwargs and stores them on the record (backward compatible — both default to nil)
+- `ApprovalQueue#approve` calls `resume_pipeline` after approval: publishes a `Legion::Transport::Messages::Task` to the stored routing key so the fleet pipeline resumes processing
+- `resume_pipeline` private helper: extracts work_item from stored payload, derives function name from routing key, publishes Task message
+
 ## [0.1.6] - 2026-03-31
 
 ### Added
