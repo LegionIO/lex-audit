@@ -8,18 +8,23 @@ module Legion
           include Legion::Extensions::Helpers::Lex if defined?(Legion::Extensions::Helpers::Lex)
           extend self
 
-          def submit(approval_type:, payload:, requester_id:, tenant_id: nil, **)
+          def submit(approval_type:, payload:, requester_id:, tenant_id: nil,
+                     resume_routing_key: nil, resume_exchange: nil, **)
             define_approval_queue_model
             json_payload = json_dump({ data: payload })
 
-            record = Legion::Extensions::Audit::Runners::ApprovalQueue::ApprovalQueue.create(
+            create_hash = {
               approval_type: approval_type,
               payload:       json_payload,
               requester_id:  requester_id,
               status:        'pending',
               tenant_id:     tenant_id,
               created_at:    Time.now.utc
-            )
+            }
+            create_hash[:resume_routing_key] = resume_routing_key if resume_routing_key
+            create_hash[:resume_exchange] = resume_exchange if resume_exchange
+
+            record = Legion::Extensions::Audit::Runners::ApprovalQueue::ApprovalQueue.create(create_hash)
             publish_event('approval_needed', record)
             { success: true, approval_id: record.id, status: 'pending' }
           end
@@ -32,7 +37,9 @@ module Legion
 
             record.update(status: 'approved', reviewer_id: reviewer_id, reviewed_at: Time.now.utc)
             publish_event('approval_decided', record)
-            { success: true, approval_id: id, status: 'approved' }
+
+            resumed = resume_pipeline(record)
+            { success: true, approval_id: id, status: 'approved', resumed: resumed }
           end
 
           def reject(id:, reviewer_id:, **)
@@ -90,6 +97,24 @@ module Legion
             ).publish
           rescue StandardError => e
             log.warn "[audit] failed to publish #{event_type}: #{e.message}"
+          end
+
+          def resume_pipeline(record)
+            return false unless record.respond_to?(:resume_routing_key) && record.resume_routing_key # rubocop:disable Legion/Extension/RunnerReturnHash
+
+            payload = json_load(record.payload)
+            routing_key = record.resume_routing_key
+            function = routing_key.split('.').last
+
+            Legion::Transport::Messages::Task.new(
+              work_item:   payload[:data]&.[](:work_item) || payload[:data],
+              function:    function,
+              routing_key: routing_key
+            ).publish
+            true
+          rescue StandardError => e
+            log.warn("resume_pipeline failed: #{e.message}")
+            false
           end
         end
       end
