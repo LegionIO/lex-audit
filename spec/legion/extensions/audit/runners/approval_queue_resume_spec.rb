@@ -78,11 +78,11 @@ RSpec.describe 'ApprovalQueue resume functionality' do
   describe '#submit with resume fields' do
     it 'stores resume_routing_key and resume_exchange' do
       result = subject.submit(
-        approval_type: 'fleet.shipping',
-        payload: { work_item: { title: 'Fix bug' } },
-        requester_id: 'fleet:developer',
+        approval_type:      'fleet.shipping',
+        payload:            { work_item: { title: 'Fix bug' } },
+        requester_id:       'fleet:developer',
         resume_routing_key: 'lex.developer.runners.developer.incorporate_feedback',
-        resume_exchange: 'lex.developer'
+        resume_exchange:    'lex.developer'
       )
       expect(result[:success]).to be true
 
@@ -94,8 +94,8 @@ RSpec.describe 'ApprovalQueue resume functionality' do
     it 'works without resume fields for backward compatibility' do
       result = subject.submit(
         approval_type: 'config_change',
-        payload: { key: 'val' },
-        requester_id: 'user-1'
+        payload:       { key: 'val' },
+        requester_id:  'user-1'
       )
       expect(result[:success]).to be true
 
@@ -111,11 +111,11 @@ RSpec.describe 'ApprovalQueue resume functionality' do
 
     it 'publishes a Messages::Task to the stored routing key when resume fields are present' do
       submit_result = subject.submit(
-        approval_type: 'fleet.escalation',
-        payload: { work_item: { title: 'Fix bug', pipeline: { resumed: true } } },
-        requester_id: 'fleet:developer',
+        approval_type:      'fleet.escalation',
+        payload:            { work_item: { title: 'Fix bug', pipeline: { resumed: true } } },
+        requester_id:       'fleet:developer',
         resume_routing_key: 'lex.developer.runners.developer.incorporate_feedback',
-        resume_exchange: 'lex.developer'
+        resume_exchange:    'lex.developer'
       )
 
       allow(subject).to receive(:json_load).and_return(parsed_payload)
@@ -133,11 +133,11 @@ RSpec.describe 'ApprovalQueue resume functionality' do
 
     it 'stores payload with resumed: true before persisting' do
       submit_result = subject.submit(
-        approval_type: 'fleet.escalation',
-        payload: { work_item: { title: 'Fix bug', pipeline: { resumed: true } } },
-        requester_id: 'fleet:developer',
+        approval_type:      'fleet.escalation',
+        payload:            { work_item: { title: 'Fix bug', pipeline: { resumed: true } } },
+        requester_id:       'fleet:developer',
         resume_routing_key: 'lex.developer.runners.developer.incorporate_feedback',
-        resume_exchange: 'lex.developer'
+        resume_exchange:    'lex.developer'
       )
 
       record = db[:approval_queue].where(id: submit_result[:approval_id]).first
@@ -148,8 +148,8 @@ RSpec.describe 'ApprovalQueue resume functionality' do
     it 'does not publish when no resume fields are present' do
       submit_result = subject.submit(
         approval_type: 'config_change',
-        payload: { key: 'val' },
-        requester_id: 'user-1'
+        payload:       { key: 'val' },
+        requester_id:  'user-1'
       )
 
       result = subject.approve(id: submit_result[:approval_id], reviewer_id: 'human-1')
@@ -161,11 +161,11 @@ RSpec.describe 'ApprovalQueue resume functionality' do
   describe '#show_approval with resume fields' do
     it 'includes resume fields in the approval record' do
       submit_result = subject.submit(
-        approval_type: 'fleet.escalation',
-        payload: { work_item: { title: 'Fix bug', pipeline: { resumed: true } } },
-        requester_id: 'fleet:developer',
+        approval_type:      'fleet.escalation',
+        payload:            { work_item: { title: 'Fix bug', pipeline: { resumed: true } } },
+        requester_id:       'fleet:developer',
         resume_routing_key: 'lex.developer.runners.developer.incorporate_feedback',
-        resume_exchange: 'lex.developer'
+        resume_exchange:    'lex.developer'
       )
 
       result = subject.show_approval(id: submit_result[:approval_id])
